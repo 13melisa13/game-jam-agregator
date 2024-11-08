@@ -104,3 +104,62 @@ The diagram should now include:
 - **Jaeger** for distributed tracing across microservices.
   
 This architecture will meet all specified requirements, providing a scalable, observable, and secure system. Let me know if you need help with specific configuration files or additional examples for any of these services!
+
+1. API Gateway
+Технология: Spring Cloud Gateway (Java) или NGINX (в качестве альтернативы).
+Задача: Маршрутизация и балансировка запросов к микросервисам, управление доступом и аутентификацией через Auth Service.
+Дополнительно: Поддержка фильтрации запросов, лимитирования и логирования.
+2. Auth Service
+Технологии: Spring Security OAuth2 (для аутентификации и авторизации), JWT (JSON Web Token) для управления токенами.
+Задача: Аутентификация пользователей и микросервисов, выдача токенов доступа.
+База данных: PostgreSQL или MySQL для хранения учетных данных пользователей.
+3. User Management Service
+Технологии: Spring Boot + Spring Data JPA (для управления базой данных).
+Задача: Управление данными пользователей, ролями и доступами.
+База данных: PostgreSQL или MySQL для хранения информации о пользователях и их ролях.
+4. File Upload Service
+Технологии: Spring Boot + Spring Web (для обработки загрузки файлов), Spring Cloud OpenFeign для взаимодействия с другими микросервисами.
+Задача: Прием загружаемых файлов, временное сохранение, отправка задачи в очередь для дальнейшей обработки.
+Очередь задач: RabbitMQ или Apache Kafka для передачи задач на обработку.
+5. Task Queue
+Технологии: RabbitMQ (если нужны простота и удобное управление задачами) или Apache Kafka (если приоритет — высокая производительность и масштабируемость).
+Задача: Асинхронная обработка задач по загрузке файлов и отправке уведомлений. Используется для передачи задач от File Upload Service к File Processor Worker и Notification Service.
+6. File Processor Worker
+Технологии: Spring Boot для обработки задач, Spring Cloud OpenFeign для взаимодействия с другими сервисами.
+Задача: Обработка файлов из очереди, проверка на вирусы через ClamAV, сохранение чистых файлов в долговременное хранилище или генерация уведомления при заражении.
+Антивирусное ПО: ClamAV Daemon (сканирование на вирусы), работающий через локальное TCP-соединение.
+Сетевые протоколы: TCP для связи с ClamAV Daemon (например, через порт 3310).
+7. ClamAV Daemon
+Технология: ClamAV (в Docker-контейнере или установленный на сервере).
+Задача: Проверка файлов на вирусы, работа в режиме демона с доступом через TCP.
+Контейнеризация: Docker или Kubernetes для развёртывания и управления.
+8. Storage Service
+Технология: Облачное хранилище (например, Amazon S3, Yandex Object Storage или аналог).
+Задача: Долговременное хранение файлов. File Processor Worker сохраняет сюда безопасные файлы, а база данных только хранит ссылки на них.
+База данных: PostgreSQL или MySQL для хранения метаданных файлов и ссылок на них.
+9. Notification Service
+Технологии: Spring Boot для создания сервиса, JavaMail API (для отправки писем через SMTP), Spring Cloud OpenFeign для взаимодействия с очередью задач.
+Задача: Получение задач из очереди и отправка уведомлений пользователям о статусе загрузки файлов (успех или ошибка).
+Почтовый сервер: SMTP сервер (локальный или внешний, например, SendGrid, Mailgun или Yandex SMTP).
+10. Event Management Service (опционально)
+Технологии: Spring Boot + Spring Data JPA для работы с базой данных, Spring Cloud OpenFeign для взаимодействия с другими сервисами.
+Задача: Управление событиями, регистрация участников, обработка заявок на участие и связь с User Management Service для проверки прав пользователей.
+База данных: PostgreSQL или MySQL для хранения информации о мероприятиях и пользователях, участвующих в них.
+Инфраструктурные компоненты
+Kubernetes: Для оркестрации и управления контейнерами всех сервисов. Kubernetes позволяет автоматически масштабировать компоненты, управлять обновлениями и мониторить состояние сервисов.
+Docker: Для контейнеризации всех сервисов, включая ClamAV, Notification Service и File Processor Worker.
+Prometheus и Grafana: Для мониторинга метрик и состояния сервисов в кластере Kubernetes.
+ELK Stack (Elasticsearch, Logstash, Kibana): Для логирования и анализа данных, удобного отслеживания ошибок и событий в системе.
+Стек и технологии в кратком виде:
+Компонент	Технологии	База данных / Хранилище
+API Gateway	Spring Cloud Gateway, NGINX	—
+Auth Service	Spring Security OAuth2, JWT	PostgreSQL / MySQL
+User Management Service	Spring Boot, Spring Data JPA	PostgreSQL / MySQL
+File Upload Service	Spring Boot, Spring Cloud OpenFeign	RabbitMQ / Kafka
+Task Queue	RabbitMQ / Apache Kafka	—
+File Processor Worker	Spring Boot, ClamAV Daemon (TCP)	RabbitMQ / Kafka
+ClamAV Daemon	ClamAV (Docker)	—
+Storage Service	Amazon S3, Yandex Object Storage	PostgreSQL / MySQL
+Notification Service	Spring Boot, JavaMail API	RabbitMQ / Kafka
+Event Management Service	Spring Boot, Spring Data JPA	PostgreSQL / MySQL
+Инфраструктура	Kubernetes, Docker, Prometheus, Grafana	ELK Stack (для логов) 
