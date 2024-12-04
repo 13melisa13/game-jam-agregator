@@ -1,0 +1,30 @@
+@startuml
+title Class Diagram for File Processor
+
+' Определение классов
+class FileProcessor {
+    +processFile(fileData)
+    +scanForViruses(filePath)
+    +saveMetadata(metadata)
+}
+
+class AntivirusService {
+    +scan(filePath)
+}
+
+class FileMetadataRepository {
+    +save(metadata)
+    +findById(fileId)
+}
+
+class CloudStorageService {
+    +uploadFile(filePath)
+    +downloadFile(fileId)
+}
+
+' Взаимосвязи
+FileProcessor --> AntivirusService
+FileProcessor --> FileMetadataRepository
+FileProcessor --> CloudStorageService
+
+@enduml

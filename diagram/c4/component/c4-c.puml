@@ -1,0 +1,62 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+LAYOUT_LEFT_RIGHT()
+title C4 Diagram - Component Level for GameJam System
+
+' API Gateway (Nginx)
+Container(nginx, "API Gateway", "Nginx", "Маршрутизирует HTTP-запросы к соответствующим сервисам")
+
+' Компоненты API Gateway
+Container_Boundary(apiGateway_boundary, "API Gateway (Nginx)") {
+    Component(authController, "Auth Controller", "Nginx", "Обрабатывает запросы авторизации")
+    Component(eventController, "Event Controller", "Nginx", "Управляет событиями и регистрацией участников")
+    Component(fileUploadController, "File Upload Controller", "Nginx", "Обрабатывает загрузку решений участников")
+    Component(notificationController, "Notification Controller", "Nginx", "Управляет уведомлениями")
+    Component(statisticsController, "Statistics Controller", "Nginx", "Обрабатывает запросы статистики")
+}
+
+' Сервисы
+Container_Boundary(services, "Services") {
+    Component(authService, "Auth Service", "Node.js", "Обрабатывает авторизацию и проверку учетных данных")
+    Component(eventService, "Event Service", "Node.js", "Управляет созданием и регистрацией событий")
+    Component(fileProcessor, "File Processor", "Python", "Обрабатывает загруженные решения, включая проверку на вирусы")
+    Component(notificationService, "Notification Service", "Node.js", "Отправляет уведомления участникам и организаторам")
+    Component(statisticsService, "Statistics Service", "Python", "Генерирует отчеты и предоставляет аналитику")
+    Component(antivirusService, "Antivirus Service", "ClamAV", "Сканирует файлы на вирусы")
+}
+
+' Базы данных
+ContainerDb(authDb, "AuthDB", "Redis", "Хранение сессий пользователей")
+ContainerDb(eventDb, "EventDB", "PostgreSQL", "Хранение данных о мероприятиях")
+ContainerDb(fileDataDb, "FileDataDB", "MongoDB", "Хранение метаданных файлов")
+ContainerDb(cloudStorage, "Cloud Storage", "S3", "Хранение загруженных решений")
+
+' Пользователи
+Person(participant, "Участник", "Загружает решения, регистрируется на события")
+Person(organizer, "Организатор", "Создает события, оценивает решения")
+
+' Взаимодействия
+Rel(participant, authController, "Входит в систему через")
+Rel(participant, eventController, "Регистрируется на события через")
+Rel(participant, fileUploadController, "Загружает решения через")
+Rel(organizer, eventController, "Создает события через")
+Rel(organizer, notificationController, "Отправляет уведомления через")
+
+Rel(authController, authService, "Вызывает")
+Rel(authService, authDb, "Читает и записывает сессии")
+
+Rel(eventController, eventService, "Вызывает")
+Rel(eventService, eventDb, "Читает и записывает данные о событиях")
+
+Rel(fileUploadController, fileProcessor, "Передает файлы для обработки")
+Rel(fileProcessor, antivirusService, "Проверяет на вирусы")
+Rel(fileProcessor, fileDataDb, "Сохраняет метаданные файлов")
+Rel(fileProcessor, cloudStorage, "Сохраняет загруженные решения")
+
+Rel(notificationController, notificationService, "Отправляет уведомления участникам и организаторам")
+Rel(notificationService, participant, "Отправляет уведомления")
+Rel(statisticsController, statisticsService, "Запрашивает статистику")
+Rel(statisticsService, eventDb, "Читает статистику событий")
+
+@enduml
+

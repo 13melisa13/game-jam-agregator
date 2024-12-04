@@ -1,0 +1,18 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+LAYOUT_LEFT_RIGHT()
+title C4 Diagram - GameJam Context (Организаторы)
+
+' Определение элементов
+Person(organizer, "Организатор", "Человек, управляющий геймджемом")
+System(gameJamSystem, "Система Геймджема", "Платформа для проведения геймджемов")
+System_Ext(notificationService, "Сервис уведомлений", "Сторонний сервис для отправки уведомлений")
+System_Ext(cloudStorage, "Облачное хранилище", "Стороннее хранилище для проверки загруженных файлов")
+System_Ext(authService, "Сервис авторизации", "Сторонний сервис для OAuth2 авторизации")
+
+' Определение взаимодействий
+Rel(organizer, gameJamSystem, "Управляет мероприятиями, оценивает работы")
+Rel(gameJamSystem, notificationService, "Отправляет уведомления организаторам через")
+Rel(gameJamSystem, cloudStorage, "Получает загруженные решения из")
+Rel(gameJamSystem, authService, "Авторизует организаторов")
+@enduml

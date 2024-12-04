@@ -1,0 +1,60 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+LAYOUT_TOP_DOWN()
+title C4 Diagram - Containers for GameJam System
+
+' Система GameJam
+Container_Boundary(gameJamSystem, "GameJam System") {
+    Container(reactiveFrontend, "Reactive Frontend", "React", "Интерфейс для участников и организаторов")
+    Container(apiGateway, "API Gateway", "Express.js", "Обрабатывает HTTP-запросы и маршрутизирует их к сервисам")
+
+    Container_Boundary(eventNode, "Event Node") {
+        Container(eventService, "Event Service", "Node.js", "Управление мероприятиями и регистрацией участников")
+        Container(statisticsService, "Statistics Service", "Python", "Сбор и предоставление аналитики по событиям")
+        ContainerDb(databaseEvents, "EventDB", "PostgreSQL", "Хранение данных о мероприятиях")
+    }
+
+    Container_Boundary(fileProcessingNode, "File Processing Node") {
+        Container(uploadFileService, "Upload File Service", "Node.js", "Обрабатывает загрузку решений участников")
+        Container(taskQueue, "Task Queue", "RabbitMQ", "Организация очередей задач для обработки файлов")
+        Container(fileProcessor, "File Processor", "Python", "Обрабатывает файлы, включая проверку и хранение")
+        Container(antivirusService, "Antivirus Service", "ClamAV", "Сканирование загруженных файлов на вирусы")
+        ContainerDb(databaseFiles, "FileDataDB", "MongoDB", "Хранение метаданных загруженных решений")
+        ContainerDb(cloudStorage, "Cloud Storage", "S3", "Хранение загруженных решений в облаке")
+    }
+
+    Container_Boundary(notificationNode, "Notification Node") {
+        Container(notificationService, "Notification Service", "Node.js", "Отправляет уведомления участникам и организаторам")
+    }
+
+    Container_Boundary(authNode, "Authentication Node") {
+        Container(oauthService, "OAuth2 Service", "OAuth2", "Авторизация пользователей")
+        ContainerDb(databaseAuth, "AuthDB", "PostgreSQL", "Хранение данных пользователей")
+    }
+}
+
+' Внешние пользователи
+Person(participant, "Участник", "Регистрируется, участвует в мероприятии, загружает решения")
+Person(organizer, "Организатор", "Управляет событиями, оценивает решения участников")
+
+' Взаимодействия
+Rel_R(participant, reactiveFrontend, "Взаимодействует через")
+Rel_R(organizer, reactiveFrontend, "Взаимодействует через")
+Rel_R(reactiveFrontend, apiGateway, "HTTP запросы")
+Rel(apiGateway, eventService, "Управление событиями")
+Rel(apiGateway, statisticsService, "Запрос статистики")
+
+Rel(apiGateway, uploadFileService, "Загрузка файлов")
+Rel(apiGateway, notificationService, "Отправка уведомлений")
+Rel(apiGateway, oauthService, "Авторизация через")
+Rel(eventService, databaseEvents, "Чтение/Запись")
+Rel(statisticsService, databaseEvents, "Аналитика")
+Rel(uploadFileService, taskQueue, "Очередь задач")
+Rel(taskQueue, fileProcessor, "Обработка файлов")
+Rel(fileProcessor, antivirusService, "Проверка на вирусы")
+Rel(fileProcessor, databaseFiles, "Сохранение метаданных файлов")
+Rel(fileProcessor, cloudStorage, "Сохранение решений")
+Rel(notificationService, participant, "Уведомления")
+
+Rel(oauthService, databaseAuth, "Проверка учётных данных")
+@enduml

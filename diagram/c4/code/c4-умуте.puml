@@ -1,0 +1,31 @@
+@startuml
+title Class Diagram for Event Service
+
+' Определение классов
+class EventService {
+    +createEvent(eventData)
+    +registerParticipant(eventId, participantData)
+    +getEventDetails(eventId)
+}
+
+class EventRepository {
+    +saveEvent(event)
+    +findEventById(eventId)
+    +addParticipant(eventId, participant)
+}
+
+class EventValidator {
+    +validateEventData(eventData)
+    +validateParticipantData(participantData)
+}
+
+class NotificationService {
+    +sendNotification(participant, message)
+}
+
+' Взаимосвязи
+EventService --> EventRepository
+EventService --> EventValidator
+EventService --> NotificationService
+
+@enduml
