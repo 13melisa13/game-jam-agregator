@@ -1,0 +1,70 @@
+@startuml
+package "Frontend" {
+  [Reactive Frontend]
+}
+
+package "API Gateway" {
+  [Gateway]
+}
+
+package "Аутентификация" {
+  [OAuth2]
+}
+
+package "События" {
+  [EventService]
+}
+
+package "Обработка файлов" {
+  [UploadFileService]
+  [TaskQueue]
+  [FileProcessor]
+  [AntivirusService]
+}
+
+package "Уведомления" {
+  [NotificationService]
+}
+
+package "Хранилище данных" {
+  database "AUTH DB"
+  database "EventDB"
+  database "FileDataDB"
+  cloud "Cloud Storage"
+}
+[Reactive Frontend] --> [API Gateway] : HTTP запросы
+[API Gateway] --> [OAuth2] : Проверка авторизации (OAuth2)
+[API Gateway] --> [EventService] : Запросы на обработку событий
+[EventService] --> [TaskQueue] : Запросы на загрузку файлов
+[API Gateway] --> [NotificationService] : Запросы на уведомления
+
+[OAuth2] --> "AUTH DB" : Чтение/Запись данных пользователей
+
+[EventService] --> EventDB : Чтение/Запись событий
+
+
+[TaskQueue] --> [UploadFileService] : Управление задачами обработки файлов
+[FileProcessor] --> AntivirusService : Антивирусная проверка файлов
+AntivirusService --> [UploadFileService]: Возврат результата
+[UploadFileService] --> FileProcessor : Обработка файлов
+[UploadFileService] --> FileDataDB : Хранение загруженных файлов
+
+[UploadFileService] --> "Cloud Storage" : Выгрузка данных в облако
+
+'[Reactive Frontend] --> [API Gateway] : HTTP запросы
+'[API Gateway] --> [OAuth2] : Проверка авторизации (OAuth2)
+'[API Gateway] --> [EventService] : Запросы на обработку событий
+'[EventService] --> [TaskQueue] : Запросы на загрузку файлов
+'[API Gateway] --> [NotificationService] : Запросы на уведомления
+'
+'[OAuth2] --> "AUTH DB" : Чтение/Запись данных пользователей
+'
+'[EventService] --> "EventDB" : Чтение/Запись событий
+'
+'[TaskQueue] --> [FileProcessor] : Управление задачами обработки файлов
+'[FileProcessor] --> [AntivirusService] : Антивирусная проверка файлов
+'AntivirusService --> [FileProcessor] : Обработка файлов
+'[FileProcessor] --> "FileDataDB" : Хранение metadata файлов
+'
+'[FileProcessor] --> "Cloud Storage" : Выгрузка данных в облако
+@enduml

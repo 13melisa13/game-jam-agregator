@@ -1,0 +1,15 @@
+skinparam backgroundColor #F9F9F9
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+
+skinparam component {
+  BackgroundColor #ADD8E6
+  BorderColor #000080
+  FontColor #000080
+}
+
+skinparam state {
+  BackgroundColor #90EE90
+  BorderColor #006400
+  FontColor #006400
+}

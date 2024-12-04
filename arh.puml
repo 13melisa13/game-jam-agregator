@@ -1,0 +1,64 @@
+@startuml
+title ArchiMate Diagram for GameJam System
+
+' Определение стилей
+<style>
+archimateDiagram {
+  .business-process {
+    BackgroundColor lightgreen
+  }
+  .application-service {
+    BackgroundColor lightblue
+  }
+  .technology-device {
+    BackgroundColor lightcoral
+  }
+  .database {
+    BackgroundColor plum
+  }
+  .external-system {
+    BackgroundColor lightgray
+  }
+}
+</style>
+
+' Бизнес-слой
+archimate #Business "Создание мероприятия" as CreateEvent <<business-process>>
+archimate #Business "Регистрация участников" as RegisterParticipants <<business-process>>
+archimate #Business "Подача проектов" as SubmitProjects <<business-process>>
+archimate #Business "Оценка проектов" as EvaluateProjects <<business-process>>
+archimate #Business "Выдача наград" as AwardWinners <<business-process>>
+
+' Слой приложений
+archimate #Application "Сервис мероприятий" as EventService <<application-service>>
+archimate #Application "Сервис авторизации" as AuthService <<application-service>>
+archimate #Application "Сервис загрузки файлов" as FileUploadService <<application-service>>
+archimate #Application "Сервис уведомлений" as NotificationService <<application-service>>
+
+' Технологический слой
+archimate #Technology "Веб-сервер" as WebServer <<technology-device>>
+archimate #Technology "Сервер приложений" as AppServer <<technology-device>>
+archimate #Technology "База данных авторизации" as AuthDB <<database>>
+archimate #Technology "База данных мероприятий" as EventDB <<database>>
+
+' Связи между бизнес-процессами и сервисами приложений
+CreateEvent --> EventService : "Инициирует"
+RegisterParticipants --> AuthService : "Использует"
+SubmitProjects --> FileUploadService : "Использует"
+EvaluateProjects --> EventService : "Собирает данные"
+AwardWinners --> NotificationService : "Уведомляет победителей"
+
+' Связи между сервисами приложений и технологическими устройствами
+EventService --> AppServer : "Развернуто на"
+AuthService --> AppServer : "Развернуто на"
+FileUploadService --> AppServer : "Развернуто на"
+NotificationService --> AppServer : "Развернуто на"
+
+' Связи между приложениями и базами данных
+AuthService --> AuthDB : "Чтение/Запись"
+EventService --> EventDB : "Чтение/Запись"
+FileUploadService --> EventDB : "Сохранение данных"
+
+' Связи между веб-сервером и сервером приложений
+WebServer --> AppServer : "Передача HTTP-запросов"
+@enduml

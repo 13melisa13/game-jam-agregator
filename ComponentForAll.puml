@@ -1,0 +1,37 @@
+@startuml
+' Объявление компонентов
+component "Reactive Frontend" as Frontend
+component "API Gateway" as APIGateway
+component "OAuth2" as OAuth
+database "AUTH DB" as AuthDB
+component "StatisticService"
+component "EventService"
+component "UploadFileService"
+component "NotificationService"
+component "TaskQueue"
+component "FileProcesser"
+component "AntivirusService"
+database "FileDataDB"
+database "EventDB"
+database "Кэширование" as Cache
+cloud "Cloud Storage" as Cloud
+
+' Взаимодействия между компонентами
+Frontend --> APIGateway : HTTP запросы
+APIGateway --> OAuth : Проверка авторизации
+OAuth --> AuthDB : Доступ к данным аутентификации
+
+APIGateway --> StatisticService : Запрос статистики
+APIGateway --> EventService : Управление событиями
+APIGateway --> UploadFileService : Загрузка файлов
+
+StatisticService --> Cache : Запрос/сохранение данных
+EventService --> EventDB : Хранение событий
+EventService --> NotificationService : Уведомления
+
+UploadFileService --> FileDataDB : Сохранение файлов
+UploadFileService --> TaskQueue : Передача задачи обработки
+TaskQueue --> FileProcesser : Запуск обработки файла
+FileProcesser --> AntivirusService : Проверка на вирусы
+FileProcesser --> Cloud : Сохранение в облаке
+@enduml

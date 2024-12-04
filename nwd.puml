@@ -1,0 +1,35 @@
+@startuml
+nwdiag {
+  network internet {
+    address = "0.0.0.0/0";
+    participants [address = "Участники"];
+  }
+  network dmz {
+    address = "192.168.1.0/24";
+    web_server [address = "192.168.1.10", label = "Веб-сервер"];
+  }
+
+  network internal {
+    address = "192.168.2.0/24";
+    app_server [address = "192.168.2.20", label = "Сервер приложений"];
+    auth_db [address = "192.168.2.30", label = "База данных авторизации"];
+    event_db [address = "192.168.2.31", label = "База данных мероприятий"];
+    file_service [address = "192.168.2.40", label = "Сервис обработки файлов"];
+    notification_service [address = "192.168.2.41", label = "Сервис уведомлений"];
+    admin_pc [address = "192.168.2.50", label = "Рабочая станция администратора"];
+  }
+  participants -- web_server;
+  web_server -- app_server;
+  app_server -- auth_db;
+  app_server -- event_db;
+  app_server -- file_service;
+  app_server -- notification_service;
+  file_service -- event_db;
+  admin_pc -- auth_db;
+  admin_pc -- event_db;
+}
+@enduml
+
+
+
+

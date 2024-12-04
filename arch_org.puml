@@ -1,0 +1,22 @@
+@startuml
+title Event Management and Evaluation Architecture
+
+' Стиль и слои
+archimate #Business "Organize GameJam" as OrganizeGameJam <<business-process>>
+archimate #Business "Evaluate Submissions" as EvaluateSubmissions <<business-process>>
+archimate #Application "Event Management Service" as EventService <<application-service>>
+archimate #Application "Submission Review Service" as ReviewService <<application-service>>
+archimate #Application "Scoring Service" as ScoringService <<application-service>>
+archimate #Application "Notification Service" as NotificationService <<application-service>>
+archimate #Technology "Event DB" as EventDB <<database>>
+archimate #Technology "Submission DB" as SubmissionDB <<database>>
+
+' Связи между элементами
+OrganizeGameJam --> EventService : "Создаёт событие"
+EvaluateSubmissions --> ReviewService : "Запускает процесс оценки"
+ReviewService --> ScoringService : "Передаёт оценки"
+ScoringService --> SubmissionDB : "Сохраняет результаты"
+ReviewService --> SubmissionDB : "Запрашивает данные решений"
+ReviewService --> NotificationService : "Уведомляет участников"
+EventService --> EventDB : "Сохраняет данные событий"
+@enduml

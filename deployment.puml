@@ -1,0 +1,56 @@
+@startuml
+node "Frontend Server" as FrontendServer {
+    [Reactive Frontend]
+}
+
+node "API Gateway Node" as APIGatewayNode {
+    [API Gateway]
+}
+
+node "Auth Node" as AuthNode {
+    [OAuth2]
+    database "AUTH DB"
+}
+
+node "Event Node" as EventNode {
+    [EventService]
+'    [StatisticService]
+    database "EventDB"
+}
+
+node "File Processing Node" as FileProcessingNode {
+    [UploadFileService]
+    [TaskQueue]
+    [FileProcessor]
+    [AntivirusService]
+    database "FileDataDB"
+    cloud "Cloud Storage"
+}
+
+node "Notification Node" as NotificationNode {
+    [NotificationService]
+}
+
+[Reactive Frontend] --> [API Gateway] : HTTP запросы
+[API Gateway] --> [OAuth2] : Проверка авторизации (OAuth2)
+[API Gateway] --> [EventService] : Запросы на обработку событий
+[EventService] --> [TaskQueue] : Запросы на загрузку файлов
+[API Gateway] --> [NotificationService] : Запросы на уведомления
+
+[OAuth2] --> "AUTH DB" : Чтение/Запись данных пользователей
+
+[EventService] --> EventDB : Чтение/Запись событий
+
+
+[TaskQueue] --> [UploadFileService] : Управление задачами обработки файлов
+[FileProcessor] --> AntivirusService : Антивирусная проверка файлов
+AntivirusService --> [UploadFileService]: Возврат результата
+[UploadFileService] --> FileProcessor : Обработка файлов
+[UploadFileService] --> FileDataDB : Хранение загруженных файлов
+
+[UploadFileService] --> "Cloud Storage" : Выгрузка данных в облако
+
+
+@enduml
+
+

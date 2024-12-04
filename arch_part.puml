@@ -1,0 +1,23 @@
+@startuml
+title Registration and Submission Architecture
+
+' Стиль и слои
+archimate #Business "User Registration" as UserRegistration <<business-process>>
+archimate #Business "Submit Solution" as SubmitSolution <<business-process>>
+archimate #Application "Authentication Service" as AuthenticationService <<application-service>>
+archimate #Application "Submission Service" as SubmissionService <<application-service>>
+archimate #Application "Notification Service" as NotificationService <<application-service>>
+archimate #Technology "Frontend Server" as FrontendServer <<technology-device>>
+
+archimate #Technology "Auth DB" as AuthDB <<database>>
+archimate #Technology "Submission DB" as SubmissionDB <<database>>
+
+' Связи между элементами
+UserRegistration --> AuthenticationService : "Инициирует"
+SubmitSolution --> SubmissionService : "Передает данные"
+AuthenticationService --> FrontendServer : "Обрабатывает запросы"
+SubmissionService --> NotificationService : "Уведомляет о статусе"
+
+AuthenticationService --> AuthDB : "Доступ к"
+SubmissionService --> SubmissionDB : "Сохраняет данные"
+@enduml

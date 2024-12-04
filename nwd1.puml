@@ -1,0 +1,26 @@
+@startuml
+nwdiag {
+network internet {
+address = "0.0.0.0/0";
+web_client [address = "Клиенты"];
+}
+network dmz {
+address = "192.168.1.0/24";
+web_server [address = "192.168.1.10"];
+}
+network internal {
+address = "192.168.2.0/24";
+app_server [address = "192.168.2.20"];
+db_server [address = "192.168.2.30"];
+admin_pc [address = "192.168.2.40"];
+}
+web_client -- web_server;
+web_server -- app_server;
+app_server -- db_server;
+admin_pc -- db_server;
+}
+@enduml
+
+
+
+
