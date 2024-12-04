@@ -165,5 +165,6 @@ gitGraph
    commit id: "prepare production"
    checkout main
    merge release/v1.0 tag: "v1.0"
+
 ```
 
