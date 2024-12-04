@@ -1,6 +1,6 @@
 # Mindmap
 
-```markmap
+```mermaid
 mindmap
 root((Функционал участников))
 Управление регистрацией
